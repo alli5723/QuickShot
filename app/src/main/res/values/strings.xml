@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">QuickShot</string>
+    <string name="camera_error">Camera Error</string>
+    <string name="request_permission">QuickShot needs your permission to use camera and storage</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
 

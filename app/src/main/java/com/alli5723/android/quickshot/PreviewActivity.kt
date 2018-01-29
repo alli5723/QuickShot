@@ -37,8 +37,10 @@ import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
+import android.util.Log
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_preview.*
 import java.io.File
@@ -63,31 +65,38 @@ class PreviewActivity : AppCompatActivity() {
 
         if (requestCode == TAKE_PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //setImageViewWithImage()
-            Picasso.with(this).load(selectedPhotoPath).fit().into(image_preview);
+            Log.e("Preview", "Preview URL is " + selectedPhotoPath)
+            Log.e("Preview", "Preview data is " + data?.data)
+            Picasso.with(this).load(data?.data).fit().into(image_preview);
         }
     }
 
     private fun takePictureWithCamera() {
         val captureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-        val imagePath = File(filesDir, "images")
-        val image_name = "QuickShot_" + System.currentTimeMillis() + ".jpg";
-        val newFile = File(imagePath, image_name)
+//        val imagePath = File(filesDir, "images")
+        val image_name = "QuickShot_" + System.currentTimeMillis() + ".jpg"
+
+        val mediaStorageDir = File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "QuickShot");
+        val newFile = File(mediaStorageDir.path, image_name)
+
+//        val newFile = File(imagePath, image_name)
         if (newFile.exists()){
             newFile.delete()
         }else{
             newFile.parentFile.mkdirs()
         }
-        selectedPhotoPath = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", newFile)
-
-        captureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, selectedPhotoPath)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        } else {
-            val clip = ClipData.newUri(contentResolver, "A photo", selectedPhotoPath)
-            captureIntent.clipData = clip
-            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        }
+////        selectedPhotoPath = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", newFile)
+//        selectedPhotoPath =  Uri.parse(newFile.path)
+//        captureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, selectedPhotoPath)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+//        } else {
+//            val clip = ClipData.newUri(contentResolver, "A photo", selectedPhotoPath)
+//            captureIntent.clipData = clip
+//            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+//        }
         startActivityForResult(captureIntent, TAKE_PHOTO_REQUEST_CODE)
     }
 
