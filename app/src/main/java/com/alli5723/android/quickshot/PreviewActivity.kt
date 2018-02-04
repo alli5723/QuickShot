@@ -51,8 +51,11 @@ class PreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview)
+        Log.e("Preview", intent.getStringExtra(INTENT_IMAGE_URI))
         if (null != intent.getStringExtra(INTENT_IMAGE_URI)){
-            Picasso.with(this).load(intent.getStringExtra(INTENT_IMAGE_URI)).fit().into(image_preview);
+            Log.e("Preview", "exists")
+            val file = intent.data
+            Picasso.with(this).load(File(file.getPath())).fit().into(image_preview);
         }
     }
 

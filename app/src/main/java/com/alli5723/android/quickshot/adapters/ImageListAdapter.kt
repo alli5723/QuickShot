@@ -24,7 +24,7 @@ class ImageListAdapter(private var mCursor: Cursor?) : RecyclerView.Adapter<Imag
 
     /* Callback for list item click events */
     interface OnItemClickListener {
-        fun onItemClick(v: View, position: Int)
+        fun onItemClick(uri: String, position: Int)
         fun onShareClicked(v: View, position: Int)
     }
 
@@ -71,7 +71,9 @@ class ImageListAdapter(private var mCursor: Cursor?) : RecyclerView.Adapter<Imag
 
     private fun postItemClick(holder: GalleryHolder) {
         if (mOnItemClickListener != null) {
-            mOnItemClickListener!!.onItemClick(holder.itemView, holder.adapterPosition)
+            val dataIndex = mCursor!!.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+            mCursor!!.moveToPosition(holder.adapterPosition)
+            mOnItemClickListener!!.onItemClick(mCursor!!.getString(dataIndex), holder.adapterPosition)
         }
     }
 

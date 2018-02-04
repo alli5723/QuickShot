@@ -33,9 +33,11 @@ import android.util.Log
 
 
 class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>, ImageListAdapter.OnItemClickListener {
-    override fun onItemClick(v: View, position: Int) {
-//        TODO("launch preview page")
-        Log.e("main", "Item click")
+    override fun onItemClick(uri: String, position: Int) {
+        val intent = Intent(applicationContext, PreviewActivity::class.java)
+        intent.putExtra(INTENT_IMAGE_URI, uri)
+        intent.setData(Uri.parse(uri))
+        startActivity(intent)
     }
 
     override fun onShareClicked(v: View, position: Int) {
@@ -122,9 +124,6 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         return Intent(this, ShotActivity::class.java).apply {
             putExtra(INTENT_LAUNCH_CAMERA, camera)
         }
-//        val intent = Intent(applicationContext, PreviewActivity::class.java)
-//        intent.putExtra(INTENT_LAUNCH_CAMERA, camera)
-//        startActivity(intent)
     }
 
     override fun onResume() {
@@ -181,6 +180,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         val INTENT_LAUNCH_CAMERA = "launch_camera"
         val ID_GALLERY_LOADER = 1;
         val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 3;
+        const private val INTENT_IMAGE_URI = "image_data"
 
         // Used to load the 'native-lib' library on application startup.
         init {
