@@ -51,57 +51,12 @@ class PreviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preview)
-
-//        val launchCamera = intent.getBooleanExtra(MainActivity.INTENT_LAUNCH_CAMERA)
-        if(intent.getBooleanExtra(MainActivity.INTENT_LAUNCH_CAMERA, false)){
-            takePictureWithCamera()
-        }else if (null != intent.getStringExtra(INTENT_IMAGE_URI)){
+        if (null != intent.getStringExtra(INTENT_IMAGE_URI)){
             Picasso.with(this).load(intent.getStringExtra(INTENT_IMAGE_URI)).fit().into(image_preview);
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == TAKE_PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            //setImageViewWithImage()
-            Log.e("Preview", "Preview URL is " + selectedPhotoPath)
-            Log.e("Preview", "Preview data is " + data?.data)
-            Picasso.with(this).load(data?.data).fit().into(image_preview);
-        }
-    }
-
-    private fun takePictureWithCamera() {
-        val captureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-//        val imagePath = File(filesDir, "images")
-        val image_name = "QuickShot_" + System.currentTimeMillis() + ".jpg"
-
-        val mediaStorageDir = File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "QuickShot");
-        val newFile = File(mediaStorageDir.path, image_name)
-
-//        val newFile = File(imagePath, image_name)
-        if (newFile.exists()){
-            newFile.delete()
-        }else{
-            newFile.parentFile.mkdirs()
-        }
-////        selectedPhotoPath = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", newFile)
-//        selectedPhotoPath =  Uri.parse(newFile.path)
-//        captureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, selectedPhotoPath)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//        } else {
-//            val clip = ClipData.newUri(contentResolver, "A photo", selectedPhotoPath)
-//            captureIntent.clipData = clip
-//            captureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//        }
-        startActivityForResult(captureIntent, TAKE_PHOTO_REQUEST_CODE)
-    }
-
     companion object {
-        const private val TAKE_PHOTO_REQUEST_CODE = 1
         const private val INTENT_IMAGE_URI = "image_data"
     }
 }

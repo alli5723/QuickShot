@@ -32,9 +32,18 @@ import android.content.pm.PackageManager
 import android.util.Log
 
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor>, ImageListAdapter.OnItemClickListener {
+    override fun onItemClick(v: View, position: Int) {
+//        TODO("launch preview page")
+        Log.e("main", "Item click")
+    }
 
-    private var adapter: ImageListAdapter? = null
+    override fun onShareClicked(v: View, position: Int) {
+//        TODO("launch share page")
+        Log.e("main", "Share")
+    }
+
+    private var adapter: ImageListAdapter = ImageListAdapter(null)
     private var cursor: Cursor? = null
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor>? {
@@ -65,12 +74,12 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
     override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
         progress.setVisibility(View.GONE)
         cursor = data
-        Log.e("DEBUG", "onItemClick: " + data!!.getCount())
-        if (data!!.getCount() != 0 && data != null) {
+        Log.e("DEBUG", "datacount: " + data!!.getCount())
+        if (data.getCount() != 0) {
             no_shot.setVisibility(View.GONE)
             adapter?.swapCursor(data)
             progress.setVisibility(View.GONE)
-        }else if(data!!.count == 0){
+        }else if(data.count == 0){
             no_shot.setVisibility(View.VISIBLE)
             Snackbar.make(progress, "There are no shots created yet using this App.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
@@ -86,7 +95,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        adapter = ImageListAdapter(null)
+        adapter.setOnItemClickListener(this)
         image_list.adapter = adapter
         val layoutManager = GridLayoutManager(this, 2)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
@@ -99,7 +108,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
             getSupportLoaderManager().initLoader(ID_GALLERY_LOADER, null, this)
         }
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ -> //view ->
             startActivity(CameraShotPreview(true))
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                    .setAction("Action", null).show()
@@ -110,12 +119,18 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
     }
 
     fun CameraShotPreview(camera: Boolean): Intent {
-        return Intent(this, PreviewActivity::class.java).apply {
+        return Intent(this, ShotActivity::class.java).apply {
             putExtra(INTENT_LAUNCH_CAMERA, camera)
         }
 //        val intent = Intent(applicationContext, PreviewActivity::class.java)
 //        intent.putExtra(INTENT_LAUNCH_CAMERA, camera)
 //        startActivity(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.e("Main", "onResume")
+        getSupportLoaderManager().restartLoader(ID_GALLERY_LOADER, null, this)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

@@ -188,9 +188,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
             cameraDevice.close()
             mCameraDevice = null
             val activity = this
-            if (null != activity) {
-                finish()
-            }
+            finish()
         }
 
     }
@@ -331,9 +329,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
      */
     private fun showToast(text: String) {
         val activity = this
-        if (activity != null) {
-            activity!!.runOnUiThread(Runnable { Toast.makeText(activity, text, Toast.LENGTH_SHORT).show() })
-        }
+        activity.runOnUiThread(Runnable { Toast.makeText(activity, text, Toast.LENGTH_SHORT).show() })
     }
 
     /**
@@ -427,9 +423,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
                                             grantResults: IntArray) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.size != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//                ErrorDialog.newInstance(getString(R.string.request_permission))
-//                        .show(getFragmentManager(), FRAGMENT_DIALOG)
-                Utils.showErrorDialog(getString(R.string.request_permission), this)
+                ErrorDialog.newInstance(getString(R.string.request_permission)).show(supportFragmentManager, FRAGMENT_DIALOG)
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -538,8 +532,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
         } catch (e: NullPointerException) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-//            ErrorDialog.newInstance(getString(R.string.camera_error)).show(getFragmentManager(), FRAGMENT_DIALOG)
-            Utils.showErrorDialog(getString(R.string.camera_error), this)
+            ErrorDialog.newInstance(getString(R.string.camera_error)).show(supportFragmentManager, FRAGMENT_DIALOG)
         }
 
     }
@@ -628,7 +621,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
             val texture = mTextureView?.getSurfaceTexture()!!
 
             // We configure the size of default buffer to be the size of camera preview we want.
-            texture!!.setDefaultBufferSize(mPreviewSize?.getWidth()!!, mPreviewSize?.getHeight()!!)
+            texture.setDefaultBufferSize(mPreviewSize?.getWidth()!!, mPreviewSize?.getHeight()!!)
 
             // This is the output Surface we need to start preview.
             val surface = Surface(texture)
@@ -688,10 +681,10 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
      */
     private fun configureTransform(viewWidth: Int, viewHeight: Int) {
         val activity = this
-        if (null == mTextureView || null == mPreviewSize || null == activity) {
+        if (null == mTextureView || null == mPreviewSize) {
             return
         }
-        val rotation = activity!!.getWindowManager().getDefaultDisplay().getRotation()
+        val rotation = activity.getWindowManager().getDefaultDisplay().getRotation()
         val matrix = Matrix()
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, mPreviewSize?.getHeight()!!.toFloat(),
@@ -763,7 +756,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
     private fun captureStillPicture() {
         try {
             val activity = this
-            if (null == activity || null == mCameraDevice) {
+            if (null == mCameraDevice) {
                 return
             }
             // This is the CaptureRequest.Builder that we use to take a picture.
@@ -901,7 +894,7 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
             val activity = activity
             return AlertDialog.Builder(activity)
                     .setMessage(arguments.getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok) { dialogInterface, i -> activity.finish() }
+                    .setPositiveButton(android.R.string.ok) { _, _ -> activity.finish() }
                     .create()
         }
 
@@ -919,26 +912,26 @@ class CameraActivity : AppCompatActivity(), View.OnClickListener, ActivityCompat
         }
 
     }
-
-    /**
-     * Shows OK/Cancel confirmation dialog about camera permission.
-     */
-    class ConfirmationDialog : DialogFragment() {
-
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val parent = parentFragment
-            return AlertDialog.Builder(activity)
-                    .setMessage("We would require Camera Permission")
-                    .setPositiveButton(android.R.string.ok, DialogInterface.OnClickListener { dialog, which ->
-                        parent.requestPermissions(arrayOf(Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
-                    })
-                    .setNegativeButton(android.R.string.cancel,
-                            DialogInterface.OnClickListener { dialog, which ->
-                                val activity = parent.activity
-                                activity?.finish()
-                            })
-                    .create()
-        }
-    }
+//
+//    /**
+//     * Shows OK/Cancel confirmation dialog about camera permission.
+//     */
+//    class ConfirmationDialog : DialogFragment() {
+//
+//        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//            val parent = parentFragment
+//            return AlertDialog.Builder(activity)
+//                    .setMessage("We would require Camera Permission")
+//                    .setPositiveButton(android.R.string.ok, DialogInterface.OnClickListener { _, _ ->
+//                        parent.requestPermissions(arrayOf(Manifest.permission.CAMERA,
+//                                Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
+//                    })
+//                    .setNegativeButton(android.R.string.cancel,
+//                            DialogInterface.OnClickListener { _, _ ->
+//                                val activity = parent.activity
+//                                activity?.finish()
+//                            })
+//                    .create()
+//        }
+//    }
 }

@@ -6,6 +6,7 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -41,7 +42,8 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".PreviewActivity" />
-        <activity android:name=".CameraActivity"></activity>
+        <activity android:name=".CameraActivity" />
+        <activity android:name=".ShotActivity"></activity>
     </application>
 
 </manifest>

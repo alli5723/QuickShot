@@ -25,19 +25,18 @@ class ImageListAdapter(private var mCursor: Cursor?) : RecyclerView.Adapter<Imag
     /* Callback for list item click events */
     interface OnItemClickListener {
         fun onItemClick(v: View, position: Int)
+        fun onShareClicked(v: View, position: Int)
     }
 
     /* ViewHolder for each task item */
     inner class GalleryHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val idIndex = mCursor!!.getColumnIndex(MediaStore.Files.FileColumns._ID)
         val nameIndex = mCursor!!.getColumnIndex(MediaStore.Files.FileColumns.TITLE)
-        val dateIndex = mCursor!!.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED)
         val dataIndex = mCursor!!.getColumnIndex(MediaStore.Files.FileColumns.DATA)
 //        var nameView: TextView
 //        var id: TextView
 //        var imageView: ImageView
 //        var play: ImageView
-        var view: View = itemView
 
         init {
 //            nameView =  itemView.findViewById(R.id.item_name) as TextView
@@ -50,11 +49,14 @@ class ImageListAdapter(private var mCursor: Cursor?) : RecyclerView.Adapter<Imag
 
         fun bindImage(position: Int){
             mCursor!!.moveToPosition(position)
-            view.item_name.text = mCursor!!.getString(nameIndex)
-            view.item_id.text = mCursor!!.getString(idIndex)
+            itemView.item_name.text = mCursor!!.getString(nameIndex)
+            itemView.item_id.text = mCursor!!.getString(idIndex)
+            itemView.item_share.setOnClickListener(View.OnClickListener {
+                postShareClick(this)
+            })
 
             val data = mCursor!!.getString(dataIndex)
-            Picasso.with(mContext).load(File(data)).fit().into(view.item_image)
+            Picasso.with(mContext).load(File(data)).fit().into(itemView.item_image)
 
         }
 
@@ -70,6 +72,12 @@ class ImageListAdapter(private var mCursor: Cursor?) : RecyclerView.Adapter<Imag
     private fun postItemClick(holder: GalleryHolder) {
         if (mOnItemClickListener != null) {
             mOnItemClickListener!!.onItemClick(holder.itemView, holder.adapterPosition)
+        }
+    }
+
+    private fun postShareClick(holder: GalleryHolder) {
+        if (mOnItemClickListener != null) {
+            mOnItemClickListener!!.onShareClicked(holder.itemView, holder.adapterPosition)
         }
     }
 

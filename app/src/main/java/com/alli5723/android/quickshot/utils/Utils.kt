@@ -25,8 +25,7 @@ import java.io.IOException
  */
 
 class Utils{
-    fun checkPermission(
-            context: Context): Boolean {
+    fun checkPermission(context: Context): Boolean {
         val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 3
         val currentAPIVersion = Build.VERSION.SDK_INT
         if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
@@ -40,8 +39,10 @@ class Utils{
                 } else {
                     ActivityCompat
                             .requestPermissions(
-                                    context as Activity,
-                                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                                    context,
+                                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                            Manifest.permission.CAMERA),
                                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)
                 }
                 return false
@@ -60,7 +61,7 @@ class Utils{
         alertBuilder.setTitle("Permission necessary")
         alertBuilder.setMessage(msg)
         alertBuilder.setPositiveButton(android.R.string.yes,
-                DialogInterface.OnClickListener { dialog, which ->
+                DialogInterface.OnClickListener { _, _ ->
                     ActivityCompat.requestPermissions(context as Activity,
                             arrayOf(Manifest.permission.CAMERA,
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -72,8 +73,6 @@ class Utils{
     }
 
     companion object {
-        val NOT_UPLOADED = 0
-        var UPLOADED = 1
         val FILE_IMAGE = "image"
         var FILE_VIDEO = "video"
 
@@ -83,7 +82,7 @@ class Utils{
             alertBuilder.setTitle("Error Occured")
             alertBuilder.setMessage(msg)
             alertBuilder.setPositiveButton(android.R.string.yes,
-                    DialogInterface.OnClickListener { dialog, which ->
+                    DialogInterface.OnClickListener { dialog, _ ->
                         dialog.dismiss()
                     })
             val alert = alertBuilder.create()
@@ -91,7 +90,7 @@ class Utils{
         }
 
         fun insertImage(cr: ContentResolver, source: Bitmap?, title: String, description: String): String? {
-
+            Log.e("Utils", "file name is " + title)
             val values = ContentValues()
             values.put(MediaStore.Images.Media.TITLE, title)
             values.put(MediaStore.Images.Media.DISPLAY_NAME, title)
@@ -106,7 +105,7 @@ class Utils{
 
             try {
                 url = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
+                Log.e("Utils", "Inserted image values to the db")
                 if (source != null) {
                     val imageOut = cr.openOutputStream(url!!)
                     try {
@@ -126,6 +125,8 @@ class Utils{
                     url = null
                 }
             } catch (e: Exception) {
+                Log.e("Utils", "Error inserting into the db")
+                e.printStackTrace()
                 if (url != null) {
                     cr.delete(url, null, null)
                     url = null
@@ -135,6 +136,7 @@ class Utils{
             if (url != null) {
                 stringUrl = url.toString()
             }
+            Log.e("Utils", stringUrl)
             return stringUrl
         }
 
@@ -181,18 +183,18 @@ class Utils{
 
         }
 
-        fun rotate(b: Bitmap, displayRotation: Int): Bitmap {
-            var b = b
+        fun rotate(bitmap: Bitmap, displayRotation: Int): Bitmap {
+            var b = bitmap
             var m: Matrix? = null
             var degrees = 0
-            val width = b!!.width.toFloat()
+            val width = b.width.toFloat()
             val height = b.height.toFloat()
             if (displayRotation == 0 && width > height) {
                 degrees = 90
             } else if (displayRotation == 3 && width > height) {
                 //            degrees = 180;
             }
-            if (degrees != 0 && b != null) {
+            if (degrees != 0) {
                 if (m == null) {
                     m = Matrix()
                 }
